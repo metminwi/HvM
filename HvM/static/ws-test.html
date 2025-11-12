@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gomoku WebSocket Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #fafafa;
+      padding: 2rem;
+    }
+    #log {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #ccc;
+      background: white;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    input, button {
+      font-size: 1rem;
+      margin: 0.25rem;
+      padding: 0.4rem 0.6rem;
+    }
+    .msg { margin: 0.25rem 0; }
+    .server { color: blue; }
+    .client { color: green; }
+  </style>
+</head>
+<body>
+  <h2>🧠 Gomoku WebSocket Test</h2>
+
+  <div>
+    <label>Room:</label>
+    <input id="room" value="room1" />
+    <button id="connect">Connect</button>
+    <button id="disconnect">Disconnect</button>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <label>Message (JSON):</label>
+    <input id="msg" size="80" value='{"type":"move","row":7,"col":7,"player":"X"}' />
+    <button id="send">Send</button>
+  </div>
+
+  <div id="log"></div>
+
+  <script>
+    let ws;
+    const log = (msg, cls='') => {
+      const p = document.createElement('div');
+      p.className = 'msg ' + cls;
+      p.textContent = msg;
+      document.getElementById('log').appendChild(p);
+      p.scrollIntoView();
+    };
+
+    document.getElementById('connect').onclick = () => {
+      const room = document.getElementById('room').value.trim() || 'room1';
+      ws = new WebSocket(`ws://127.0.0.1:8000/ws/game/${room}/`);
+      ws.onopen = () => log(`✅ Connected to room: ${room}`, 'server');
+      ws.onmessage = (e) => log(`⬅️ ${e.data}`, 'server');
+      ws.onclose = () => log('❌ Disconnected', 'server');
+      ws.onerror = (err) => log('⚠️ Error: ' + err, 'server');
+    };
+
+    document.getElementById('send').onclick = () => {
+      const val = document.getElementById('msg').value;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(val);
+        log('➡️ ' + val, 'client');
+      } else {
+        log('WebSocket not connected', 'server');
+      }
+    };
+
+    document.getElementById('disconnect').onclick = () => {
+      if (ws) ws.close();
+    };
+  </script>
+</body>
+</html>

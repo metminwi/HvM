@@ -1,0 +1,35 @@
+# .gitignore
+# Environnements virtuels
+myenv/
+env/
+venv/
+.venv/
+
+# Base de données
+*.sqlite3
+*.db
+
+# Fichiers Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environnements
+.env
+.venv
+
+# Django
+media/
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Système
+.DS_Store
+Thumbs.db
